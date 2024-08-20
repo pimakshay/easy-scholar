@@ -1,0 +1,5 @@
+
+model:
+  embedding_model: nomic-embed-text
+  llm_model: gemma2:2b
+
