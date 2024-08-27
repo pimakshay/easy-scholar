@@ -2,7 +2,11 @@ import warnings
 
 from langchain.llms.ollama import Ollama
 from langchain.embeddings.ollama import OllamaEmbeddings
+
 from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders.generic import GenericLoader
+from langchain_community.document_loaders.parsers import GrobidParser
+
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import RetrievalQA
@@ -20,9 +24,21 @@ class PDFQuery:
     def setup_embeddings(self, model_name="nomic-embed-text"):
         self.embeddings = OllamaEmbeddings(model=model_name)
 
-    def load_and_process_pdf(self):
-        loader = PyPDFLoader(file_path=self.file_path)
-        pages = loader.load_and_split()
+    def load_and_process_pdf(self, loader_name="PyPDFLoader"):
+        if loader_name == "PyPDFLoader":
+            loader = PyPDFLoader(file_path=self.file_path)
+            pages = loader.load_and_split()
+        elif loader_name == "GrobidParser":
+            """
+            For using Grobid, you need to the Grobid server running. Follow the below steps to pull Grobid image and run it on docker:
+            Step 1: docker pull grobid/grobid:0.8.1-name-address
+            Step 2: docker run --rm --init --ulimit core=0 -p 8070:8070 grobid/grobid:0.8.1-name-address
+            """
+            loader = GenericLoader.from_filesystem(
+                self.file_path,
+                parser=GrobidParser(segment_sentences=False),
+            )
+            pages = loader.load()
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         texts = text_splitter.split_documents(pages)
         self.docSearch = Chroma.from_documents(texts, embedding=self.embeddings)

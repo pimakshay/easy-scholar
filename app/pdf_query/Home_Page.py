@@ -2,7 +2,6 @@ import streamlit as st
 import sys, os
 import base64
 from omegaconf import OmegaConf
-from notebooks.pdf_query import PDFQuery
 
 def display_pdf(file_path):
     with open(file_path, "rb") as f:
@@ -15,6 +14,7 @@ CURR_DIR = os.path.dirname('__file__')
 ROOT_DIR=os.path.join(os.getcwd() ,'../..')
 sys.path.append(ROOT_DIR)
 
+from notebooks.pdf_query import PDFQuery
 # load configs
 config = OmegaConf.load(os.path.join(ROOT_DIR,'src/configs/config_pdfquery.yaml'))
 
@@ -33,7 +33,7 @@ if uploaded_file is not None:
 
     chatbot = PDFQuery(file_path="temp.pdf")
     chatbot.setup_embeddings(model_name=config.model.embedding_model)
-    chatbot.load_and_process_pdf()
+    chatbot.load_and_process_pdf(loader_name=config.model.loader_name)
 
     inferred_model = chatbot.infer_model(model_name=config.model.llm_model)
     st.write(f"Inferred model: {inferred_model}")
