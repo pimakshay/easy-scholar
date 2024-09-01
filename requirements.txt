@@ -2,3 +2,5 @@ pypdf
 langchain
 openai
 chromadb
+grobid-tei-xml
+rank_bm25

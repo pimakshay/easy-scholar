@@ -9,7 +9,6 @@ _archiv/*
 *.log
 *.zip
 *.ckpt
-*.ipynb
 *.pdf
 
 # ignore files and folders
